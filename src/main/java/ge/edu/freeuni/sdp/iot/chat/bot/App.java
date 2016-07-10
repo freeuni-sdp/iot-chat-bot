@@ -2,10 +2,10 @@ package ge.edu.freeuni.sdp.iot.chat.bot;
 
 import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
 import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
+import ge.edu.freeuni.sdp.iot.chat.bot.proxies.BathLightServiceProxy;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.HouseServiceProxy;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.RouterServiceProxy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -57,12 +57,16 @@ public class App {
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
-					.add("R", "Router Info", 1)
+					.add("1", "Bath Light Sensor", 1)
+					.add("2", "Router Info", 2)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
 			switch (command) {
 				case 1:
+					bathLightSensor();
+					break;
+				case 2:
 					routerInfo();
 					break;
 				case 0:
@@ -73,13 +77,18 @@ public class App {
 		}
 	}
 
+	private static void bathLightSensor() {
+		BathLightServiceProxy proxy = new BathLightServiceProxy("https://iot-bath-light-sensor.herokuapp.com/webapi/status");
+		System.out.println("\n" + proxy.getBathLight(house.getID()) + "\n");
+	}
+
 	private static void routerInfo() {
-		RouterServiceProxy routerServiceProxy = new RouterServiceProxy("http://iot-router.herokuapp.com/webapi/houses/" + house.getRowKey());
+		RouterServiceProxy routerServiceProxy = new RouterServiceProxy("http://iot-router.herokuapp.com/webapi/houses/" + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
-					.add("L", "List All Addresses", 1)
-					.add("I", "Is Anyone At Home?", 2)
+					.add("1", "List All Addresses", 1)
+					.add("2", "Is Anyone At Home?", 2)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 

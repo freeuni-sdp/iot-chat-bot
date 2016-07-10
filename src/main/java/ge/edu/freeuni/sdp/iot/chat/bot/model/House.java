@@ -26,7 +26,7 @@ public class House {
         this.ventIp = ventIp;
     }
 
-    public String getRowKey() {
+    public String getID() {
         return rowKey;
     }
 
