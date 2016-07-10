@@ -1,5 +1,11 @@
 package ge.edu.freeuni.sdp.iot.chat.bot;
 
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -33,15 +39,14 @@ public class PingURLs {
         long end = 0;
         String b = "Error occured while pinging. ";
         String result = "";
+        ClientConfig config = new ClientConfig().register(JacksonFeature.class);
+        Client client = ClientBuilder.newClient(config);
         try {
-            URL siteURL = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) siteURL
-                    .openConnection();
-            connection.setRequestMethod("GET");
-            start = System.currentTimeMillis();
-            connection.connect();
 
-            int code = connection.getResponseCode();
+            start = System.currentTimeMillis();
+            Response response = client.target(url).request().get();
+
+            int code = response.getStatus();
             end = System.currentTimeMillis();
             b = Long.toString(end - start);
             result = "Response Code: " + code + "; Duration: " + b + " ms;";
