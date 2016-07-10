@@ -1,16 +1,9 @@
 package ge.edu.freeuni.sdp.iot.chat.bot.proxies;
 
 import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,7 @@
 package ge.edu.freeuni.sdp.iot.chat.bot;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Scanner;
 
 public class OptionList<T> {
 

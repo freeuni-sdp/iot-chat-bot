@@ -5,6 +5,7 @@ import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.BathLightServiceProxy;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.HouseServiceProxy;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.RouterServiceProxy;
+import ge.edu.freeuni.sdp.iot.chat.bot.proxies.SoilMoistureServiceProxy;
 
 import java.util.List;
 import java.util.Scanner;
@@ -58,7 +59,8 @@ public class App {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
 					.add("1", "Bath Light Sensor", 1)
-					.add("2", "Router Info", 2)
+					.add("2", "Soil Moisture Sensor", 2)
+					.add("3", "Router Info", 3)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -67,6 +69,9 @@ public class App {
 					bathLightSensor();
 					break;
 				case 2:
+					soilMoistureSensor();
+					break;
+				case 3:
 					routerInfo();
 					break;
 				case 0:
@@ -77,13 +82,21 @@ public class App {
 		}
 	}
 
+	private static void soilMoistureSensor() {
+		SoilMoistureServiceProxy proxy = new SoilMoistureServiceProxy
+				("http://private-anon-6aaf5a2d7-sdp2.apiary-mock.com/house/" + house.getID());
+		System.out.println("\n" + proxy.getSoilMoisture() + "\n");
+	}
+
 	private static void bathLightSensor() {
-		BathLightServiceProxy proxy = new BathLightServiceProxy("https://iot-bath-light-sensor.herokuapp.com/webapi/status");
+		BathLightServiceProxy proxy = new BathLightServiceProxy
+				("https://iot-bath-light-sensor.herokuapp.com/webapi/status");
 		System.out.println("\n" + proxy.getBathLight(house.getID()) + "\n");
 	}
 
 	private static void routerInfo() {
-		RouterServiceProxy routerServiceProxy = new RouterServiceProxy("http://iot-router.herokuapp.com/webapi/houses/" + house.getID());
+		RouterServiceProxy routerServiceProxy = new RouterServiceProxy
+				("http://iot-router.herokuapp.com/webapi/houses/" + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
