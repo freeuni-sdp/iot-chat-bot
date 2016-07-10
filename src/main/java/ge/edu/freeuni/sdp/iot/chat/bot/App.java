@@ -2,6 +2,7 @@ package ge.edu.freeuni.sdp.iot.chat.bot;
 
 import ge.edu.freeuni.sdp.iot.chat.bot.model.BathHumidity;
 import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
+import ge.edu.freeuni.sdp.iot.chat.bot.model.RoomThermometer;
 import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.*;
 
@@ -49,17 +50,38 @@ public class App {
 		List<House> houses = houseServiceProxy.getAll();
 		int houseIndex = printHouses(options, houses).read(scanner);
 		house = houses.get(houseIndex);
-		getRequests();
+		printOptions();
 	}
 
-	private static void getRequests() {
+	private static void printOptions() {
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Sensors", 1)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					sensorsOption();
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void sensorsOption() {
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
 					.add("1", "Bath Light Sensor", 1)
 					.add("2", "Soil Moisture Sensor", 2)
 					.add("3", "Bath Humidity Sensor", 3)
-					.add("4", "Router Info", 4)
+					.add("4", "Room Thermometer Sensor", 4)
+					.add("5", "Router Info", 5)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -74,6 +96,9 @@ public class App {
 					bathHumiditySensor();
 					break;
 				case 4:
+					roomThermometerSensor();
+					break;
+				case 5:
 					routerInfo();
 					break;
 				case 0:
@@ -82,6 +107,49 @@ public class App {
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static void roomThermometerSensor() {
+		RoomThermometerServiceProxy roomThermometerServiceProxy = new RoomThermometerServiceProxy
+				("https://iot-room-thermometer.herokuapp.com/webapi/houses/" + house.getID() + "/floors");
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "On All Floors", 1)
+					.add("2", "Choose Floor", 2)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					listAllThermometers(roomThermometerServiceProxy);
+					break;
+				case 2:
+					chooseFloorForThermometer(roomThermometerServiceProxy);
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void chooseFloorForThermometer(RoomThermometerServiceProxy roomThermometerServiceProxy) {
+		System.out.print("\nChoose Floor: ");
+		Scanner in = new Scanner(System.in);
+		int num = in.nextInt();
+		RoomThermometer thermometer = roomThermometerServiceProxy.getFromFloor(num);
+		System.out.println("\n" + thermometer + "\n");
+	}
+
+	private static void listAllThermometers(RoomThermometerServiceProxy roomThermometerServiceProxy) {
+		List<RoomThermometer> roomThermometers = roomThermometerServiceProxy.getAll();
+		System.out.println("Listing All Thermometers:\n");
+		for (RoomThermometer thermometer: roomThermometers) {
+			System.out.println(thermometer);
+		}
+		System.out.println();
 	}
 
 	private static void bathHumiditySensor() {
