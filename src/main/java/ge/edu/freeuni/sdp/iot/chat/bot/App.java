@@ -1,11 +1,9 @@
 package ge.edu.freeuni.sdp.iot.chat.bot;
 
+import ge.edu.freeuni.sdp.iot.chat.bot.model.BathHumidity;
 import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
 import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
-import ge.edu.freeuni.sdp.iot.chat.bot.proxies.BathLightServiceProxy;
-import ge.edu.freeuni.sdp.iot.chat.bot.proxies.HouseServiceProxy;
-import ge.edu.freeuni.sdp.iot.chat.bot.proxies.RouterServiceProxy;
-import ge.edu.freeuni.sdp.iot.chat.bot.proxies.SoilMoistureServiceProxy;
+import ge.edu.freeuni.sdp.iot.chat.bot.proxies.*;
 
 import java.util.List;
 import java.util.Scanner;
@@ -60,7 +58,8 @@ public class App {
 			int command = new OptionList<Integer>().title("Choose Action:")
 					.add("1", "Bath Light Sensor", 1)
 					.add("2", "Soil Moisture Sensor", 2)
-					.add("3", "Router Info", 3)
+					.add("3", "Bath Humidity Sensor", 3)
+					.add("4", "Router Info", 4)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -72,6 +71,9 @@ public class App {
 					soilMoistureSensor();
 					break;
 				case 3:
+					bathHumiditySensor();
+					break;
+				case 4:
 					routerInfo();
 					break;
 				case 0:
@@ -80,6 +82,19 @@ public class App {
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static void bathHumiditySensor() {
+		BathHumidityServiceProxy proxy = new BathHumidityServiceProxy
+				("https://iot-bath-humidity-sensor.herokuapp.com/webapi/houses/" + house.getID());
+		System.out.print("\nHow Many Measurements? ");
+		Scanner in = new Scanner(System.in);
+		int num = in.nextInt();
+		List<BathHumidity> humidities = proxy.getBathHumidities(num);
+		System.out.println();
+		for (BathHumidity humid: humidities)
+			System.out.println(humid);
+		System.out.println();
 	}
 
 	private static void soilMoistureSensor() {
