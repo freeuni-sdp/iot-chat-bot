@@ -21,26 +21,25 @@ public class PingURLs {
                 "https://iot-temperature-scheduler.herokuapp.com/ping","https://iot-room-climate-regulator.herokuapp.com/webapi/ping",
                 "https://iot-weather.herokuapp.com/webapi/ping","https://iot-camera-object-recognizer.herokuapp.com/webapi/ping",
                 "https://iot-soil-moisture-sensor.herokuapp.com/ping","https://iot-sprinkler-switch.herokuapp.com/webapi/ping",
-                "https://iot-sprinkler-scheduler.herokuapp.com/webapi/ping","\thttps://iot-sprinkler.herokuapp.com/webapi/ping"
+                "https://iot-sprinkler-scheduler.herokuapp.com/webapi/ping","https://iot-sprinkler.herokuapp.com/webapi/ping"
         };
-
+        ClientConfig config = new ClientConfig().register(JacksonFeature.class);
+        Client client = ClientBuilder.newClient(config);
         for (int i = 0; i < hostList.length; i++) {
 
             String url = hostList[i];
-            String status = getStatus(url);
+            String status = getStatus(url, client);
 
             System.out.println(url + "\t\tStatus:" + status);
         }
 
     }
 
-    public String getStatus(String url) {
+    public String getStatus(String url, Client client) {
         long start = 0;
         long end = 0;
         String b = "Error occured while pinging. ";
         String result = "";
-        ClientConfig config = new ClientConfig().register(JacksonFeature.class);
-        Client client = ClientBuilder.newClient(config);
         try {
 
             start = System.currentTimeMillis();
