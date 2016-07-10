@@ -8,14 +8,14 @@ public class PingURLs {
 
     public void printPings() {
 
-        String[] hostList = { "https://iot-bath-vent-switch.herokuapp.com/webapi/ping","https://bath-climate.herokuapp.com/bathclimate/ping",
+        String[] hostList = { "https://iot-bath-vent-switch.herokuapp.com/ping","https://bath-climate.herokuapp.com/webapi/ping",
                 "https://iot-bath-light-sensor.herokuapp.com/webapi/ping","https://iot-bath-humidity-sensor.herokuapp.com/webapi/ping",
                 "https://iot-router.herokuapp.com/webapi/ping","https://iot-air-conditioning-switch.herokuapp.com/webapi/ping",
                 "https://iot-room-thermometer.herokuapp.com/webapi/ping","https://iot-heating-switch.herokuapp.com/ping",
-                "https://iot-temperature-scheduler.herokuapp.com/webapi/ping","https://iot-room-climate-regulator.herokuapp.com/webapi/ping",
-                "http://iot-weather.herokuapp.com/webapi/ping","https://iot-camera-object-recognizer.herokuapp.com/webapi/ping",
-                "https://iot-soil-moisture-sensor.herokuapp.com/webapi/ping","https://iot-sprinkler-switch.herokuapp.com/webapi/ping",
-                "https://iot-sprinkler-scheduler.herokuapp.com/ping","https://iot-sprinkler.herokuapp.com/webapi/ping","https://iot-router.herokuapp.com/webapi/ping"
+                "https://iot-temperature-scheduler.herokuapp.com/ping","https://iot-room-climate-regulator.herokuapp.com/webapi/ping",
+                "https://iot-weather.herokuapp.com/webapi/ping","https://iot-camera-object-recognizer.herokuapp.com/webapi/ping",
+                "https://iot-soil-moisture-sensor.herokuapp.com/ping","https://iot-sprinkler-switch.herokuapp.com/webapi/ping",
+                "https://iot-sprinkler-scheduler.herokuapp.com/webapi/ping","\thttps://iot-sprinkler.herokuapp.com/webapi/ping"
         };
 
         for (int i = 0; i < hostList.length; i++) {
