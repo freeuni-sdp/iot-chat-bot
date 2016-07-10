@@ -1,9 +1,6 @@
 package ge.edu.freeuni.sdp.iot.chat.bot;
 
-import ge.edu.freeuni.sdp.iot.chat.bot.model.BathHumidity;
-import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
-import ge.edu.freeuni.sdp.iot.chat.bot.model.RoomThermometer;
-import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
+import ge.edu.freeuni.sdp.iot.chat.bot.model.*;
 import ge.edu.freeuni.sdp.iot.chat.bot.proxies.*;
 
 import java.util.List;
@@ -58,6 +55,7 @@ public class App {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
 					.add("1", "Sensors", 1)
+					.add("2", "Switches", 2)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -65,12 +63,92 @@ public class App {
 				case 1:
 					sensorsOption();
 					break;
+				case 2:
+					switchOption();
+					break;
 				case 0:
 					return;
 				default:
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static void switchOption() {
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Sprinkler Switch", 1)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					sprinklerSwitch();
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void sprinklerSwitch() {
+		SprinklerSwitchServiceProxy proxy = new SprinklerSwitchServiceProxy
+				("https://iot-sprinkler-switch.herokuapp.com/webapi/houses/" + house.getID());
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Check Status", 1)
+					.add("2", "Change Status", 2)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					checkSprinklerStatus(proxy);
+					break;
+				case 2:
+					changeSprinklerStatus(proxy);
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void changeSprinklerStatus(SprinklerSwitchServiceProxy proxy) {
+		SprinklerSwitch sprinklerSwitch = checkSprinklerStatus(proxy);
+		String status;
+		int timeout;
+		if (sprinklerSwitch.isOn()) {
+			System.out.print("Turning off... ");
+			status = "off";
+			timeout = 0;
+		} else {
+			System.out.print("Enter Number of Seconds: ");
+			Scanner in = new Scanner(System.in);
+			timeout = in.nextInt();
+			status = "on";
+			System.out.print("Turning on... ");
+		}
+		SprinklerSwitch sprinklerSwitch1 = proxy.changeSprinklerStatus(status, timeout);
+		String res;
+		if (sprinklerSwitch1 == null)
+			res = "Failed!";
+		else
+			res = "Successful!";
+		System.out.print(res + "\n");
+	}
+
+	private static SprinklerSwitch checkSprinklerStatus(SprinklerSwitchServiceProxy proxy) {
+		SprinklerSwitch sprinklerSwitch = proxy.getSprinklerStatus();
+		String status = sprinklerSwitch.getStatus().substring(0, 1).toUpperCase() + sprinklerSwitch.getStatus().substring(1);
+		System.out.println("\nSprinkler Switch Status: " + status + "\n");
+		return sprinklerSwitch;
 	}
 
 	private static void sensorsOption() {

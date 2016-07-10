@@ -21,15 +21,15 @@ public class ServiceProxy {
         client = ClientBuilder.newClient(config);
     }
 
-    private boolean is404(Response response) {
+    protected boolean is404(Response response) {
         return isStatus(response, Response.Status.NOT_FOUND);
     }
 
-    private boolean is201(Response response) {
+    protected boolean is201(Response response) {
         return isStatus(response, Response.Status.CREATED);
     }
 
-    private boolean isStatus(Response response, Response.Status status ) {
+    protected boolean isStatus(Response response, Response.Status status ) {
         return response.getStatus() ==	status.getStatusCode();
     }
 }
