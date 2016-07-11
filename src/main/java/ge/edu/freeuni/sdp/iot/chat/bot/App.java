@@ -85,10 +85,15 @@ public class App {
 					.read(scanner);
 
 			switch (command) {
-				case 2:
-					bathVentSwitch();
+
 				case 1:
 					sprinklerSwitch();
+					break;
+				case 2:
+					bathVentSwitch();
+					break;
+				case 3:
+					airConditioningSwitch();
 					break;
 				case 0:
 					return;
@@ -96,6 +101,82 @@ public class App {
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static void airConditioningSwitch() {
+		AirConditioningSwitchProxy proxy = new AirConditioningSwitchProxy
+				("http://private-d0abb-airconditioningswitch.apiary-mock.com/webapi/houses/" + house.getID());
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Check Air-Conditioning Status", 1)
+					.add("2", "Change Air-Conditioning Status", 2)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					checkAirConditioningStatus(proxy);
+					break;
+				case 2:
+					changeAirConditioningStatus(proxy);
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void changeAirConditioningStatus(AirConditioningSwitchProxy proxy) {
+		String status;
+
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			System.out.print("Enter Status ( Off(off), Weak Cold(w), Strong Cold(s) or Ventilation(v) ): ");
+			Scanner in = new Scanner(System.in);
+			status = in.nextLine();
+			if (status.toLowerCase().equals("w")) {
+				System.out.print("Turning on Weak Cold... ");
+				status = "*";
+				break;
+			}
+			if (status.toLowerCase().equals("s")) {
+				System.out.print("Turning on Strong Cold... ");
+				status = "**";
+				break;
+			}
+			if (status.toLowerCase().equals("v")) {
+				System.out.print("Turning on Ventilation... ");
+				status = "#";
+				break;
+			}
+
+			if (status.toLowerCase().equals("off")) {
+				System.out.print("Turning off... ");
+				status = "0";
+				break;
+			}
+			else {
+				System.out.println("Please Enter Valid choice.");
+			}
+		}
+		boolean airConditioningSwitch = proxy.changeAirConditioningStatus(status);
+		String res;
+		if (! airConditioningSwitch)
+			res = "Failed!";
+		else
+			res = "Successful!";
+		System.out.print(res + "\n");
+	}
+
+	private static AirConditioningSwitch checkAirConditioningStatus(AirConditioningSwitchProxy proxy) {
+		AirConditioningSwitch airConditioningSwitch = proxy.getAirConditioningStatus();
+		String status = airConditioningSwitch.getStatus();
+		System.out.println("\n Air-ConditioningSwitch Switch Sta" +
+				"tus: " + status + "\n");
+		return airConditioningSwitch;
 	}
 
 	private static void bathVentSwitch(){
