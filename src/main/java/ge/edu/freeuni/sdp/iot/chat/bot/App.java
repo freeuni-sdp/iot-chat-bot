@@ -78,9 +78,10 @@ public class App {
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
-					.add("3", "Air-conditioning Switch", 3)
-					.add("2", "Bath-vent Switch", 2)
 					.add("1", "Sprinkler Switch", 1)
+					.add("2", "Bath-vent Switch", 2)
+					.add("3", "Air-conditioning Switch", 3)
+					.add("4", "Heating Switch", 4)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -95,11 +96,78 @@ public class App {
 				case 3:
 					airConditioningSwitch();
 					break;
+				case 4:
+					heatingSwitch();
+					break;
 				case 0:
 					return;
 				default:
 					System.out.println("Please Enter Valid Action");
 			}
+		}
+	}
+
+	private static void heatingSwitch() {
+		HeatingSwitchServiceProxy proxy = new HeatingSwitchServiceProxy
+				("https://iot-heating-switch.herokuapp.com/house/" + house.getID());
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Get Switch Status", 1)
+					.add("2", "Turn On Switch", 2)
+					.add("3", "Turn Off Switch", 3)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					getHeatingSwitchStatus(proxy);
+					break;
+				case 2:
+					turnOnHeatingSwitch(proxy);
+					break;
+				case 3:
+					turnOffHeatingSwitch(proxy);
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void getHeatingSwitchStatus(HeatingSwitchServiceProxy proxy) {
+		System.out.print("Enter Floor Number: ");
+		Scanner in = new Scanner(System.in);
+		int floor = in.nextInt();
+		HeatingSwitch heatingSwitch = proxy.getSwitchStatusByFloor(String.valueOf(floor));
+		System.out.println("Floor: " + floor + ", " + heatingSwitch.toString());
+	}
+
+	private static void turnOnHeatingSwitch(HeatingSwitchServiceProxy proxy) {
+		System.out.print("Enter Floor Number: ");
+		Scanner in = new Scanner(System.in);
+		int floor = in.nextInt();
+		System.out.print("\nEnter Period: ");
+		int period = in.nextInt();
+		boolean bool = proxy.turnOnSwitch(String.valueOf(floor), period);
+		if (bool) {
+			System.out.println("Success");
+		} else {
+			System.out.println("Failed");
+		}
+	}
+
+	private static void turnOffHeatingSwitch(HeatingSwitchServiceProxy proxy) {
+		System.out.print("Enter Floor Number: ");
+		Scanner in = new Scanner(System.in);
+		int floor = in.nextInt();
+		boolean bool = proxy.turnOffSwitch(String.valueOf(floor));
+		if (bool) {
+			System.out.println("Success");
+		} else {
+			System.out.println("Failed");
 		}
 	}
 
