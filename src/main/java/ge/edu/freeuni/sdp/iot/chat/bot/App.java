@@ -78,13 +78,43 @@ public class App {
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("3", "Air-conditioning Switch", 3)
+					.add("2", "Bath-vent Switch", 2)
 					.add("1", "Sprinkler Switch", 1)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
 			switch (command) {
+				case 2:
+					bathVentSwitch();
 				case 1:
 					sprinklerSwitch();
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void bathVentSwitch(){
+		BathVentSwitchProxy proxy = new BathVentSwitchProxy
+				("http://private-anon-1ca5b1d89-iotbathventswitch.apiary-mock.com/houses/" + house.getID());
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Check bath-vent Status", 1)
+					.add("2", "Change bath-vent Status", 2)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+				case 1:
+					checkBathVentStatus(proxy);
+					break;
+				case 2:
+					changeBathVentStatus(proxy);
 					break;
 				case 0:
 					return;
@@ -118,6 +148,47 @@ public class App {
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static BathVentSwitch checkBathVentStatus(BathVentSwitchProxy proxy) {
+		BathVentSwitch bathVentSwitch = proxy.getBathVentStatus();
+		String status = bathVentSwitch.getStatus().substring(0, 1).toUpperCase() + bathVentSwitch.getStatus().substring(1);
+		System.out.println("\n Bath-vent Switch Sta" +
+				"tus: " + status + "\n");
+		return bathVentSwitch;
+	}
+
+	private static void changeBathVentStatus(BathVentSwitchProxy proxy) {
+		String status;
+		int timeout = 0;
+
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			System.out.print("Enter Status (On or Off): ");
+			Scanner in = new Scanner(System.in);
+			status = in.nextLine();
+			if (status.toLowerCase().equals("on")) {
+				System.out.print("Enter Number of Seconds for timeout: ");
+				Scanner in1 = new Scanner(System.in);
+				timeout = in1.nextInt();
+				System.out.print("Turning on... ");
+				break;
+			}
+			if (status.toLowerCase().equals("off")) {
+				System.out.print("Turning off... ");
+				break;
+			}
+			else {
+				System.out.println("Please Enter Valid choice.");
+			}
+		}
+		BathVentSwitch bathVentSwitch = proxy.changeBathVentStatus(status, timeout);
+		String res;
+		if (bathVentSwitch == null)
+			res = "Failed!";
+		else
+			res = "Successful!";
+		System.out.print(res + "\n");
 	}
 
 	private static void changeSprinklerStatus(SprinklerSwitchServiceProxy proxy) {
