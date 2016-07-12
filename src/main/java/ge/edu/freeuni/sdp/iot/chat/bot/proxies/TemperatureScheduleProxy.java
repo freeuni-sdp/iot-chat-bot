@@ -1,6 +1,6 @@
 package ge.edu.freeuni.sdp.iot.chat.bot.proxies;
 
-import ge.edu.freeuni.sdp.iot.chat.bot.model.House;
+import ge.edu.freeuni.sdp.iot.chat.bot.model.TemperatureSchedule;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -9,17 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Nikoloz on 07/10/16.
+ * Created by Nikoloz on 07/12/16.
  */
-public class HouseServiceProxy extends ServiceProxy{
-
-    public HouseServiceProxy(String uri) {
+public class TemperatureScheduleProxy extends ServiceProxy {
+    public TemperatureScheduleProxy(String uri) {
         super(uri);
     }
 
-    public List<House> getAll() {
+    public List<TemperatureSchedule> getTemperatureSchedules(int floor) {
         Response response = client.
-                target(uri)
+                target(uri + "/floors/" + floor + "/schedule?start=4&end=10")
                 .request()
                 .get();
         if (!isSuccess(response))
@@ -30,13 +29,11 @@ public class HouseServiceProxy extends ServiceProxy{
         } catch (Exception e) {
             return null;
         }
-        List<House> houses = new ArrayList<>();
+        List<TemperatureSchedule> temperatureSchedules = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             JSONObject object = array.getJSONObject(i);
-            houses.add(House.fromJson(object));
+            temperatureSchedules.add(TemperatureSchedule.fromJson(object));
         }
-        return houses;
+        return temperatureSchedules;
     }
-
-
 }

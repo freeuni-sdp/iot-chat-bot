@@ -1,7 +1,6 @@
 package ge.edu.freeuni.sdp.iot.chat.bot.proxies;
 
 import ge.edu.freeuni.sdp.iot.chat.bot.model.AirConditioningSwitch;
-import ge.edu.freeuni.sdp.iot.chat.bot.model.BathVentSwitch;
 import org.json.JSONObject;
 
 import javax.ws.rs.client.Entity;

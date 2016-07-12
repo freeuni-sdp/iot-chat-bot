@@ -4,7 +4,6 @@ import ge.edu.freeuni.sdp.iot.chat.bot.model.SprinklerSwitch;
 import org.json.JSONObject;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**

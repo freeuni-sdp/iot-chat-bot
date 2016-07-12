@@ -7,11 +7,22 @@ import java.util.List;
 import java.util.Scanner;
 
 public class App {
+	private static final String HOUSE_REGISTRY_URL = "http://iot-house-registry.herokuapp.com/houses";
+	private static final String TEMPERATURE_SCHEDULER_URL = "http://private-anon-20273e8228-iottemperaturescheduler.apiary-mock.com/webapi/houses/";
+	private static final String HEATING_SWITCH_URL = "https://iot-heating-switch.herokuapp.com/house/";
+	private static final String AIR_CONDITIONING_SWITCH_URL = "http://private-d0abb-airconditioningswitch.apiary-mock.com/webapi/houses/";
+	private static final String BATH_VENT_SWITCH_PROXY = "http://private-anon-1ca5b1d89-iotbathventswitch.apiary-mock.com/houses/";
+	private static final String SPRINKLER_SWITCH_URL = "https://iot-sprinkler-switch.herokuapp.com/webapi/houses/";
+	private static final String ROOM_THERMOMETER_SENSOR_URL = "https://iot-room-thermometer.herokuapp.com/webapi/houses/";
+	private static final String BATH_HUMIDITY_SENSOR_URL = "https://iot-bath-humidity-sensor.herokuapp.com/webapi/houses/";
+	private static final String SOIL_MOISTUER_SENSOR_URL = "http://private-anon-6aaf5a2d7-sdp2.apiary-mock.com/house/";
+	private static final String BATH_LIGHT_SENSOR_URL = "https://iot-bath-light-sensor.herokuapp.com/webapi/status";
+	private static final String ROUTER_URL = "http://iot-router.herokuapp.com/webapi/houses/";
+
 
 	public static Scanner scanner;
 	private static House house;
-	private static HouseServiceProxy houseServiceProxy = new HouseServiceProxy("http://iot-house-registry.herokuapp.com/houses");
-
+	private static HouseServiceProxy houseServiceProxy = new HouseServiceProxy(HOUSE_REGISTRY_URL);
 
 	public static void main(String[] args) {
 
@@ -64,6 +75,7 @@ public class App {
 			int command = new OptionList<Integer>().title("Choose Action:")
 					.add("1", "Sensors", 1)
 					.add("2", "Switches", 2)
+					.add("3", "Schedulers", 3)
 					.add("B", "Go Back", 0)
 					.read(scanner);
 
@@ -74,12 +86,75 @@ public class App {
 				case 2:
 					switchOption();
 					break;
+				case 3:
+					schedulersOption();
 				case 0:
 					return;
 				default:
 					System.out.println("Please Enter Valid Action");
 			}
 		}
+	}
+
+	private static void schedulersOption() {
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Temperature Scheduler", 1)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+
+				case 1:
+					temperatureScheduler();
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void temperatureScheduler() {
+		TemperatureScheduleProxy proxy = new TemperatureScheduleProxy
+				(TEMPERATURE_SCHEDULER_URL + house.getID());
+		while (true) {
+			System.out.println("-------------------------------------------------------");
+			int command = new OptionList<Integer>().title("Choose Action:")
+					.add("1", "Get Scheduler", 1)
+					.add("B", "Go Back", 0)
+					.read(scanner);
+
+			switch (command) {
+
+				case 1:
+					getTemperatureScheduler(proxy);
+					break;
+				case 0:
+					return;
+				default:
+					System.out.println("Please Enter Valid Action");
+			}
+		}
+	}
+
+	private static void getTemperatureScheduler(TemperatureScheduleProxy proxy) {
+		System.out.print("Enter Floor Number: ");
+		Scanner in = new Scanner(System.in);
+		int floor = in.nextInt();
+		System.out.println("\nChecking Heating Switch Status...");
+		List<TemperatureSchedule> schedules = proxy.getTemperatureSchedules(floor);
+		if (schedules == null) {
+			printServerError();
+			return;
+		}
+		System.out.println();
+		for (TemperatureSchedule schedule: schedules) {
+			System.out.println(schedule);
+		}
+		System.out.println();
 	}
 
 	private static void switchOption() {
@@ -117,7 +192,7 @@ public class App {
 
 	private static void heatingSwitch() {
 		HeatingSwitchServiceProxy proxy = new HeatingSwitchServiceProxy
-				("https://iot-heating-switch.herokuapp.com/house/" + house.getID());
+				(HEATING_SWITCH_URL + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -186,7 +261,7 @@ public class App {
 
 	private static void airConditioningSwitch() {
 		AirConditioningSwitchProxy proxy = new AirConditioningSwitchProxy
-				("http://private-d0abb-airconditioningswitch.apiary-mock.com/webapi/houses/" + house.getID());
+				(AIR_CONDITIONING_SWITCH_URL + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -267,7 +342,7 @@ public class App {
 
 	private static void bathVentSwitch(){
 		BathVentSwitchProxy proxy = new BathVentSwitchProxy
-				("http://private-anon-1ca5b1d89-iotbathventswitch.apiary-mock.com/houses/" + house.getID());
+				(BATH_VENT_SWITCH_PROXY + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -293,7 +368,7 @@ public class App {
 
 	private static void sprinklerSwitch() {
 		SprinklerSwitchServiceProxy proxy = new SprinklerSwitchServiceProxy
-				("https://iot-sprinkler-switch.herokuapp.com/webapi/houses/" + house.getID());
+				(SPRINKLER_SWITCH_URL + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -441,7 +516,7 @@ public class App {
 
 	private static void roomThermometerSensor() {
 		RoomThermometerServiceProxy roomThermometerServiceProxy = new RoomThermometerServiceProxy
-				("https://iot-room-thermometer.herokuapp.com/webapi/houses/" + house.getID() + "/floors");
+				(ROOM_THERMOMETER_SENSOR_URL + house.getID() + "/floors");
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -493,7 +568,7 @@ public class App {
 
 	private static void bathHumiditySensor() {
 		BathHumidityServiceProxy proxy = new BathHumidityServiceProxy
-				("https://iot-bath-humidity-sensor.herokuapp.com/webapi/houses/" + house.getID());
+				(BATH_HUMIDITY_SENSOR_URL + house.getID());
 		System.out.print("\nHow Many Measurements? ");
 		Scanner in = new Scanner(System.in);
 		int num = in.nextInt();
@@ -511,7 +586,7 @@ public class App {
 
 	private static void soilMoistureSensor() {
 		SoilMoistureServiceProxy proxy = new SoilMoistureServiceProxy
-				("http://private-anon-6aaf5a2d7-sdp2.apiary-mock.com/house/" + house.getID());
+				(SOIL_MOISTUER_SENSOR_URL + house.getID());
 		System.out.println("\nChecking Soil Moisture Sensor...");
 		SoilMoisture soilMoisture = proxy.getSoilMoisture();
 		if (soilMoisture == null) {
@@ -523,7 +598,7 @@ public class App {
 
 	private static void bathLightSensor() {
 		BathLightServiceProxy proxy = new BathLightServiceProxy
-				("https://iot-bath-light-sensor.herokuapp.com/webapi/status");
+				(BATH_LIGHT_SENSOR_URL);
 		System.out.println("\nChecking Bath Light Sensor...");
 		BathLight bathLight = proxy.getBathLight(house.getID());
 		if (bathLight == null) {
@@ -535,7 +610,7 @@ public class App {
 
 	private static void routerInfo() {
 		RouterServiceProxy routerServiceProxy = new RouterServiceProxy
-				("http://iot-router.herokuapp.com/webapi/houses/" + house.getID());
+				(ROUTER_URL + house.getID());
 		while (true) {
 			System.out.println("-------------------------------------------------------");
 			int command = new OptionList<Integer>().title("Choose Action:")
@@ -590,7 +665,5 @@ public class App {
         p.printPings();
 		System.out.print("Enter new action:");
 	}
-
-
 
 }
