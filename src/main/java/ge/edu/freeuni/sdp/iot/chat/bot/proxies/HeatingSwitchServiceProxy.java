@@ -16,11 +16,18 @@ public class HeatingSwitchServiceProxy extends ServiceProxy {
     }
 
     public HeatingSwitch getSwitchStatusByFloor(String floor) {
-        String str = client.
+        Response response = client.
                 target(uri + "/floor/" + floor)
                 .request()
-                .get(String.class);
-        JSONObject object = new JSONObject(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         return HeatingSwitch.fromJson(object);
     }
 
@@ -32,10 +39,7 @@ public class HeatingSwitchServiceProxy extends ServiceProxy {
                 .request()
                 .header("Content-Type", "application/json")
                 .put(Entity.json(jsonObject.toString()));
-        if (is404(response)) {
-            return false;
-        }
-        return true;
+        return isSuccess(response);
     }
 
     public boolean turnOffSwitch(String floor) {
@@ -43,9 +47,6 @@ public class HeatingSwitchServiceProxy extends ServiceProxy {
                 .target(uri + "/floor/" + floor)
                 .request()
                 .delete();
-        if (is404(response)) {
-            return false;
-        }
-        return true;
+        return isSuccess(response);
     }
 }

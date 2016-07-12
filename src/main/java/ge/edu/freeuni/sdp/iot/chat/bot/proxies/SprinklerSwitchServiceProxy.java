@@ -16,11 +16,18 @@ public class SprinklerSwitchServiceProxy extends ServiceProxy {
     }
 
     public SprinklerSwitch getSprinklerStatus() {
-        String str = client.
+        Response response = client.
                 target(uri)
                 .request()
-                .get(String.class);
-        JSONObject object = new JSONObject(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         return SprinklerSwitch.fromJson(object);
     }
 
@@ -37,7 +44,12 @@ public class SprinklerSwitchServiceProxy extends ServiceProxy {
         if (is404(response)) {
             return null;
         }
-        String output = response.readEntity(String.class);
-        return  SprinklerSwitch.fromJson(new JSONObject(output));
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
+        return SprinklerSwitch.fromJson(object);
     }
 }

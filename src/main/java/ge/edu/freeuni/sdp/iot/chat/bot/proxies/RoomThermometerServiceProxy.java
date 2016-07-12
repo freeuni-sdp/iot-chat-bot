@@ -4,6 +4,7 @@ import ge.edu.freeuni.sdp.iot.chat.bot.model.RoomThermometer;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +17,18 @@ public class RoomThermometerServiceProxy extends ServiceProxy {
     }
 
     public List<RoomThermometer> getAll() {
-        String str = client.
+        Response response = client.
                 target(uri)
                 .request()
-                .get(String.class);
-        JSONArray array = new JSONArray(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONArray array;
+        try {
+            array = new JSONArray(response.readEntity(String.class));
+        } catch (Exception e){
+            return null;
+        }
         List<RoomThermometer> roomThermometers = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             roomThermometers.add(RoomThermometer.fromJson(array.getJSONObject(i)));
@@ -29,11 +37,18 @@ public class RoomThermometerServiceProxy extends ServiceProxy {
     }
 
     public RoomThermometer getFromFloor(int floor) {
-        String str = client.
+        Response response = client.
                 target(uri + "/" + floor)
                 .request()
-                .get(String.class);
-        JSONObject jsonObject = new JSONObject(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         return RoomThermometer.fromJson(jsonObject);
     }
 }

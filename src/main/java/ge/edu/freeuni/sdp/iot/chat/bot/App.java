@@ -41,10 +41,18 @@ public class App {
 		}
 	}
 
+	private static void printServerError() {
+		System.out.println("Server error!");
+	}
+
 	private static void chooseHouse() {
 		OptionList<Integer> options = new OptionList<Integer>();
 		options.title("Choose House:");
 		List<House> houses = houseServiceProxy.getAll();
+		if (houses == null) {
+			printServerError();
+			return;
+		}
 		int houseIndex = printHouses(options, houses).read(scanner);
 		house = houses.get(houseIndex);
 		printOptions();
@@ -141,7 +149,12 @@ public class App {
 		System.out.print("Enter Floor Number: ");
 		Scanner in = new Scanner(System.in);
 		int floor = in.nextInt();
+		System.out.println("\nChecking Heating Switch Status...");
 		HeatingSwitch heatingSwitch = proxy.getSwitchStatusByFloor(String.valueOf(floor));
+		if (heatingSwitch == null) {
+			printServerError();
+			return;
+		}
 		System.out.println("Floor: " + floor + ", " + heatingSwitch.toString());
 	}
 
@@ -235,12 +248,17 @@ public class App {
 		if (! airConditioningSwitch)
 			res = "Failed!";
 		else
-			res = "Successful!";
+			res = "Success!";
 		System.out.print(res + "\n");
 	}
 
 	private static AirConditioningSwitch checkAirConditioningStatus(AirConditioningSwitchProxy proxy) {
+		System.out.println("\nChecking Air Conditioning Switch Status...");
 		AirConditioningSwitch airConditioningSwitch = proxy.getAirConditioningStatus();
+		if (airConditioningSwitch == null) {
+			printServerError();
+			return null;
+		}
 		String status = airConditioningSwitch.getStatus();
 		System.out.println("\n Air-ConditioningSwitch Switch Sta" +
 				"tus: " + status + "\n");
@@ -300,7 +318,12 @@ public class App {
 	}
 
 	private static BathVentSwitch checkBathVentStatus(BathVentSwitchProxy proxy) {
+		System.out.println("\nChecking Bath Vent Switch Status...");
 		BathVentSwitch bathVentSwitch = proxy.getBathVentStatus();
+		if (bathVentSwitch == null) {
+			printServerError();
+			return null;
+		}
 		String status = bathVentSwitch.getStatus().substring(0, 1).toUpperCase() + bathVentSwitch.getStatus().substring(1);
 		System.out.println("\n Bath-vent Switch Sta" +
 				"tus: " + status + "\n");
@@ -342,6 +365,10 @@ public class App {
 
 	private static void changeSprinklerStatus(SprinklerSwitchServiceProxy proxy) {
 		SprinklerSwitch sprinklerSwitch = checkSprinklerStatus(proxy);
+		if (sprinklerSwitch == null) {
+			printServerError();
+			return;
+		}
 		String status;
 		int timeout;
 		if (sprinklerSwitch.isOn()) {
@@ -365,7 +392,12 @@ public class App {
 	}
 
 	private static SprinklerSwitch checkSprinklerStatus(SprinklerSwitchServiceProxy proxy) {
+		System.out.println("\nChecking Sprinkler Switch Status...");
 		SprinklerSwitch sprinklerSwitch = proxy.getSprinklerStatus();
+		if (sprinklerSwitch == null) {
+			printServerError();
+			return null;
+		}
 		String status = sprinklerSwitch.getStatus().substring(0, 1).toUpperCase() + sprinklerSwitch.getStatus().substring(1);
 		System.out.println("\nSprinkler Switch Status: " + status + "\n");
 		return sprinklerSwitch;
@@ -437,13 +469,22 @@ public class App {
 		System.out.print("\nChoose Floor: ");
 		Scanner in = new Scanner(System.in);
 		int num = in.nextInt();
+		System.out.println("\nChecking Thermometer Sensor:\n");
 		RoomThermometer thermometer = roomThermometerServiceProxy.getFromFloor(num);
+		if (thermometer == null) {
+			printServerError();
+			return;
+		}
 		System.out.println("\n" + thermometer + "\n");
 	}
 
 	private static void listAllThermometers(RoomThermometerServiceProxy roomThermometerServiceProxy) {
+		System.out.println("\nListing All Thermometers:\n");
 		List<RoomThermometer> roomThermometers = roomThermometerServiceProxy.getAll();
-		System.out.println("Listing All Thermometers:\n");
+		if (roomThermometers == null) {
+			printServerError();
+			return;
+		}
 		for (RoomThermometer thermometer: roomThermometers) {
 			System.out.println(thermometer);
 		}
@@ -456,7 +497,12 @@ public class App {
 		System.out.print("\nHow Many Measurements? ");
 		Scanner in = new Scanner(System.in);
 		int num = in.nextInt();
+		System.out.println("\nChecking Bath Humidity Sensor...");
 		List<BathHumidity> humidities = proxy.getBathHumidities(num);
+		if (humidities == null) {
+			printServerError();
+			return;
+		}
 		System.out.println();
 		for (BathHumidity humid: humidities)
 			System.out.println(humid);
@@ -466,13 +512,25 @@ public class App {
 	private static void soilMoistureSensor() {
 		SoilMoistureServiceProxy proxy = new SoilMoistureServiceProxy
 				("http://private-anon-6aaf5a2d7-sdp2.apiary-mock.com/house/" + house.getID());
-		System.out.println("\n" + proxy.getSoilMoisture() + "\n");
+		System.out.println("\nChecking Soil Moisture Sensor...");
+		SoilMoisture soilMoisture = proxy.getSoilMoisture();
+		if (soilMoisture == null) {
+			printServerError();
+			return;
+		}
+		System.out.println("\n" + soilMoisture + "\n");
 	}
 
 	private static void bathLightSensor() {
 		BathLightServiceProxy proxy = new BathLightServiceProxy
 				("https://iot-bath-light-sensor.herokuapp.com/webapi/status");
-		System.out.println("\n" + proxy.getBathLight(house.getID()) + "\n");
+		System.out.println("\nChecking Bath Light Sensor...");
+		BathLight bathLight = proxy.getBathLight(house.getID());
+		if (bathLight == null) {
+			printServerError();
+			return;
+		}
+		System.out.println("\n" + bathLight + "\n");
 	}
 
 	private static void routerInfo() {
@@ -507,8 +565,12 @@ public class App {
 	}
 
 	private static void listAllAddresses(RouterServiceProxy proxy) {
+		System.out.println("\nListing mac addresses that are connected to the router:\n");
 		List<Router> routers = proxy.getAll();
-		System.out.println("Listing mac addresses that are connected to the router:\n");
+		if (routers == null) {
+			printServerError();
+			return;
+		}
 		for (Router router: routers) {
 			System.out.println(router);
 		}

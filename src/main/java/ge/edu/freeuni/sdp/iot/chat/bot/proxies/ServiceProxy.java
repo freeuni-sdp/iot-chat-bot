@@ -29,6 +29,10 @@ public class ServiceProxy {
         return isStatus(response, Response.Status.CREATED);
     }
 
+    protected boolean isSuccess(Response response) {
+        return response.getStatus() / 100 == 2;
+    }
+
     protected boolean isStatus(Response response, Response.Status status ) {
         return response.getStatus() ==	status.getStatusCode();
     }

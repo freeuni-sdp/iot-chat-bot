@@ -15,11 +15,18 @@ public class BathVentSwitchProxy extends ServiceProxy {
     }
 
     public BathVentSwitch getBathVentStatus() {
-        String str = client.
+        Response response = client.
                 target(uri)
                 .request()
-                .get(String.class);
-        JSONObject object = new JSONObject(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         return BathVentSwitch.fromJson(object);
     }
 
@@ -32,10 +39,15 @@ public class BathVentSwitchProxy extends ServiceProxy {
                 .request()
                 .header("Content-Type", "application/json")
                 .put(Entity.json(jsonObject.toString()));
-        if (is404(response)) {
+        if (!isSuccess(response)) {
             return null;
         }
-        String output = response.readEntity(String.class);
-        return  BathVentSwitch.fromJson(new JSONObject(output));
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
+        return  BathVentSwitch.fromJson(object);
     }
 }

@@ -4,6 +4,7 @@ import ge.edu.freeuni.sdp.iot.chat.bot.model.Router;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,11 +18,18 @@ public class RouterServiceProxy extends ServiceProxy{
     }
 
     public List<Router> getAll() {
-        String str = client.
+        Response response = client.
                 target(uri + "/addresses")
                 .request()
-                .get(String.class);
-        JSONArray array = new JSONArray(str);
+                .get();
+        if (!isSuccess(response))
+            return null;
+        JSONArray array;
+        try {
+            array = new JSONArray(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         List<Router> routers = new ArrayList<>();
         for (int i = 0; i < array.length(); i++) {
             routers.add(Router.fromJson(array.getJSONObject(i)));
@@ -30,11 +38,18 @@ public class RouterServiceProxy extends ServiceProxy{
     }
 
     public boolean isAnyoneAtHome() {
-        String str = client.
+        Response response = client.
                 target(uri + "/available")
                 .request()
-                .get(String.class);
-        JSONObject object = new JSONObject(str);
+                .get();
+        if (!isSuccess(response))
+            return false;
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return false;
+        }
         return object.getBoolean("atHome");
     }
 }

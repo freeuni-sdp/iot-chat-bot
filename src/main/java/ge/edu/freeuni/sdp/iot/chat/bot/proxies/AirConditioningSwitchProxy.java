@@ -16,11 +16,19 @@ public class AirConditioningSwitchProxy extends ServiceProxy {
     }
 
     public AirConditioningSwitch getAirConditioningStatus() {
-        String str = client.
+        Response response = client.
                 target(uri)
                 .request()
-                .get(String.class);
-        JSONObject object = new JSONObject(str);
+                .get();
+        if (!isSuccess(response)) {
+            return null;
+        }
+        JSONObject object;
+        try {
+            object = new JSONObject(response.readEntity(String.class));
+        } catch (Exception e) {
+            return null;
+        }
         return AirConditioningSwitch.fromJson(object);
     }
 
@@ -32,9 +40,6 @@ public class AirConditioningSwitchProxy extends ServiceProxy {
                 .request()
                 .header("Content-Type", "application/json")
                 .post(Entity.json(jsonObject.toString()));
-        if (is404(response)) {
-            return false;
-        }
-        return true;
+        return isSuccess(response);
     }
 }
